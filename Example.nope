@@ -1,30 +1,30 @@
-# type is a "variadic keyword"
-# type <name> ...
+(* type is a "variadic keyword" *)
+(* type <name> ... *)
 
 @type ; Void : Type
-# ; @type (: Void Type)
-# @type (: Void Type)
+(* ; @type (: Void Type) *)
+(* @type (: Void Type) *)
 
 @type ; Unit : Type
   Un : Unit
-# @type (: Unit Type) (: Un Unit)
+(* @type (: Unit Type) (: Un Unit) *)
 
 @type ; Bool : Type
   False : Bool
   True : Bool
-# @type (: Bool Type) (: False Bool) (: True Bool)
+(* @type (: Bool Type) (: False Bool) (: True Bool) *)
 
 @type ; Bool3 : Type
   Yes : Bool3
   No : Bool3
   Maybe : Bool3
-# @type (: Bool3 Type) (: Yes Bool3) (: No Bool3) (: Maybe Bool3)
+(* @type (: Bool3 Type) (: Yes Bool3) (: No Bool3) (: Maybe Bool3) *)
 
 @type ; Maybe : 'a -> Type
   None : Maybe _
   Some : 'a -> Maybe 'a
-# @type (: Maybe ('a -> Type)) (: None (Maybe _)) (: Some ('a -> Maybe 'a))
-# @type (: Maybe (-> 'a Type)) (: None (Maybe _)) (: Some (-> 'a (Maybe 'a)))
+(* @type (: Maybe ('a -> Type)) (: None (Maybe _)) (: Some ('a -> Maybe 'a)) *)
+(* @type (: Maybe (-> 'a Type)) (: None (Maybe _)) (: Some (-> 'a (Maybe 'a))) *)
 
 @let ; map : -> 'a 'b -> Maybe 'a -> Maybe 'b
   f . x .
@@ -32,35 +32,34 @@
       None => None
       Some y => Some ; f y
   
-# @let (: map (-> 'a 'b -> Maybe 'a -> Maybe 'b)) (...)
-# @let (: map (-> 'a 'b -> Maybe 'a -> Maybe 'b)) (...)
-# @let (: map ((-> 'a 'b) -> (Maybe 'a -> Maybe 'b))) (...)
-# @let (: map ((-> 'a 'b) -> (-> (Maybe 'a) (Maybe 'b)))) (...)
-#
-# . f (x . (@match x (None => None) (Some y => Some ; f y)))
-# . f (. x (@match x (=> None None) (=> (Some y) (Some ; f y))))
-# . f (. x (@match x (=> None None) (=> (Some y) (Some (f y)))))
+(* @let (: map (-> 'a 'b -> Maybe 'a -> Maybe 'b)) (...) *)
+(* @let (: map (-> 'a 'b -> Maybe 'a -> Maybe 'b)) (...) *)
+(* @let (: map ((-> 'a 'b) -> (Maybe 'a -> Maybe 'b))) (...) *)
+(* @let (: map ((-> 'a 'b) -> (-> (Maybe 'a) (Maybe 'b)))) (...) *)
+(* . f (x . (@match x (None => None) (Some y => Some ; f y))) *)
+(* . f (. x (@match x (=> None None) (=> (Some y) (Some ; f y)))) *)
+(* . f (. x (@match x (=> None None) (=> (Some y) (Some (f y))))) *)
 
 @type ; Result : 'e -> 'o -> Type
   Error : 'e -> Result 'e _
   Ok : 'o -> Result _ 'o
-# @type (: Result ('e -> 'o -> Type)) (: Error ('e -> Result 'e _)) (: Ok ('o -> Result _ 'o))
-# @type (: Result (-> 'e (-> 'o Type))) (: Error (-> 'e (Result 'e _))) (: Ok (-> 'o (Result _ 'o)))
+(* @type (: Result ('e -> 'o -> Type)) (: Error ('e -> Result 'e _)) (: Ok ('o -> Result _ 'o)) *)
+(* @type (: Result (-> 'e (-> 'o Type))) (: Error (-> 'e (Result 'e _))) (: Ok (-> 'o (Result _ 'o))) *)
 
 @let ; notTrue : Bool
   False
-# = notTrue (: Bool) False
+(* = notTrue (: Bool) False *)
 
 @let ; id : 'a -> 'a
   x . x
-# = id (: 'a -> 'a) (x . x)
-# = id (: (-> 'a 'a)) (. x x)
+(* = id (: 'a -> 'a) (x . x) *)
+(* = id (: (-> 'a 'a)) (. x x) *)
 
 @let ; const : 'a -> 'b -> 'a
   x . _ . x
-# = const (: 'a -> 'b -> 'a) (x . _ . x)
-# = const (: (-> 'a ('b -> 'a))) (. x (_ . x))
-# = const (: (-> 'a (-> 'b 'a))) (. x (. _ x))
+(* = const (: 'a -> 'b -> 'a) (x . _ . x) *)
+(* = const (: (-> 'a ('b -> 'a))) (. x (_ . x)) *)
+(* = const (: (-> 'a (-> 'b 'a))) (. x (. _ x)) *)
 
 @type Int8 : Type
   B0 : Int8

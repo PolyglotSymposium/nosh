@@ -1,6 +1,5 @@
 module Nope
 
-%access public export
 %default total
 
 data Token
@@ -26,6 +25,7 @@ idPossiblyInfixed x = if isInfixed x then InfixId x else Identifier x
 tokenize : String -> List Token
 tokenize = map idPossiblyInfixed . words
 
+public export
 data Ast : Type where
   Term : String -> Ast
   Appl : Ast -> Ast -> List Ast -> Ast
@@ -68,8 +68,10 @@ mutual
   parse ((Identifier i) :: ts) = parse_ i ts
   parse ((InfixId i) :: ts) = parse_ i ts
 
+export
 exec : String -> Maybe Ast
 exec ts =
   case tokenize ts of
     [] => Nothing
     (t :: ts') => Just $ parse $ t :: ts'
+
