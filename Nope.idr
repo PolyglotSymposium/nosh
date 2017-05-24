@@ -26,15 +26,15 @@ tokenize : String -> List Token
 tokenize = map idPossiblyInfixed . words
 
 public export
-data Ast : Type where
-  Term : String -> Ast
-  Appl : Ast -> Ast -> List Ast -> Ast
+data NopeAst : Type where
+  Term : String -> NopeAst
+  Appl : NopeAst -> NopeAst -> List NopeAst -> NopeAst
 
-%name Ast ast, ast_, ast'
+%name NopeAst ast, ast_, ast'
 
 data Terms : Type where
-  AllTerms : Ast -> List Ast -> Terms
-  TermsAndThen : Ast -> List Ast -> String -> Ast -> Terms
+  AllTerms : NopeAst -> List NopeAst -> Terms
+  TermsAndThen : NopeAst -> List NopeAst -> String -> NopeAst -> Terms
 
 consTerm : String -> Terms -> Terms
 consTerm x (AllTerms a as) = AllTerms (Term x) (a :: as)
@@ -50,7 +50,7 @@ mutual
   terms ((InfixId x) :: []) = AllTerms (Term x) []
   terms ((InfixId x) :: xs@(_ :: _)) = consTerm x $ terms xs
 
-  parse_ : String -> List Token -> Ast
+  parse_ : String -> List Token -> NopeAst
   parse_ i [] = Term i
   parse_ i ts@((Identifier x) :: _) =
     case terms ts of
@@ -63,14 +63,14 @@ mutual
   parse_ i ((InfixId ii) :: ts@(_ :: _)) =
     Appl (Term ii) (Term i) [parse ts]
 
-  parse : (l : List Token) -> { auto p : NonEmpty l } -> Ast
+  parse : (l : List Token) -> { auto p : NonEmpty l } -> NopeAst
   parse [] {p} impossible
   parse ((Identifier i) :: ts) = parse_ i ts
   parse ((InfixId i) :: ts) = parse_ i ts
 
 export
-exec : String -> Maybe Ast
-exec ts =
+parseNope : String -> Maybe NopeAst
+parseNope ts =
   case tokenize ts of
     [] => Nothing
     (t :: ts') => Just $ parse $ t :: ts'
