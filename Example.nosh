@@ -1,0 +1,107 @@
+(* type is a "variadic keyword" *)
+(* type <name> ... *)
+
+@type ; Void : Type
+(* ; @type (: Void Type) *)
+(* @type (: Void Type) *)
+
+@type ; Unit : Type
+  Un : Unit
+(* @type (: Unit Type) (: Un Unit) *)
+
+@type ; Bool : Type
+  False : Bool
+  True : Bool
+(* @type (: Bool Type) (: False Bool) (: True Bool) *)
+
+@type ; Bool3 : Type
+  Yes : Bool3
+  No : Bool3
+  Maybe : Bool3
+(* @type (: Bool3 Type) (: Yes Bool3) (: No Bool3) (: Maybe Bool3) *)
+
+@type ; Maybe : 'a -> Type
+  None : Maybe _
+  Some : 'a -> Maybe 'a
+(* @type (: Maybe ('a -> Type)) (: None (Maybe _)) (: Some ('a -> Maybe 'a)) *)
+(* @type (: Maybe (-> 'a Type)) (: None (Maybe _)) (: Some (-> 'a (Maybe 'a))) *)
+
+@let ; map : -> 'a 'b -> Maybe 'a -> Maybe 'b
+  f . x .
+    @match x
+      None => None
+      Some y => Some ; f y
+  
+(* @let (: map (-> 'a 'b -> Maybe 'a -> Maybe 'b)) (...) *)
+(* @let (: map (-> 'a 'b -> Maybe 'a -> Maybe 'b)) (...) *)
+(* @let (: map ((-> 'a 'b) -> (Maybe 'a -> Maybe 'b))) (...) *)
+(* @let (: map ((-> 'a 'b) -> (-> (Maybe 'a) (Maybe 'b)))) (...) *)
+(* . f (x . (@match x (None => None) (Some y => Some ; f y))) *)
+(* . f (. x (@match x (=> None None) (=> (Some y) (Some ; f y)))) *)
+(* . f (. x (@match x (=> None None) (=> (Some y) (Some (f y))))) *)
+
+@type ; Result : 'e -> 'o -> Type
+  Error : 'e -> Result 'e _
+  Ok : 'o -> Result _ 'o
+(* @type (: Result ('e -> 'o -> Type)) (: Error ('e -> Result 'e _)) (: Ok ('o -> Result _ 'o)) *)
+(* @type (: Result (-> 'e (-> 'o Type))) (: Error (-> 'e (Result 'e _))) (: Ok (-> 'o (Result _ 'o))) *)
+
+@let ; notTrue : Bool
+  False
+(* = notTrue (: Bool) False *)
+
+@let ; id : 'a -> 'a
+  x . x
+(* = id (: 'a -> 'a) (x . x) *)
+(* = id (: (-> 'a 'a)) (. x x) *)
+
+@let ; const : 'a -> 'b -> 'a
+  x . _ . x
+(* = const (: 'a -> 'b -> 'a) (x . _ . x) *)
+(* = const (: (-> 'a ('b -> 'a))) (. x (_ . x)) *)
+(* = const (: (-> 'a (-> 'b 'a))) (. x (. _ x)) *)
+
+@type Int8 : Type
+  B0 : Int8
+  B1 : Int8
+  B2 : Int8
+  B3 : Int8
+  B4 : Int8
+  B5 : Int8
+  B6 : Int8
+  B- : Int8
+
+@let ; + : Int8 -> Int8 -> Int8 
+  x . y .
+    @match ; x , y
+      , B0 x => x
+      , x B0 => x
+      , B1 B1 => B2
+      , B1 B2 => B3
+      , B1 B3 => B4
+      , B1 B4 => B5
+      , B1 B5 => B6
+      , B2 B1 => B3
+      , B2 B2 => B4
+      , B2 B3 => B5
+      , B2 B4 => B6
+      , B3 B1 => B4
+      , B3 B2 => B5
+      , B3 B3 => B6
+      , B4 B1 => B5
+      , B4 B2 => B6
+      , B5 B1 => B6
+      , _ _ => B-
+
+@let ; * : Int8 -> Int8 -> Int8
+  x . y .
+    @match ; x , y
+      , B0 _ => B0
+      , _ B0 => B0
+      , B1 x => x
+      , x B1 => x
+      , B2 B2 => B4
+      , B2 B3 => B6
+      , B3 B2 => B6
+      , _ _ => B-
+
