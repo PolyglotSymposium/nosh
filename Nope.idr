@@ -83,43 +83,31 @@ mutual
   terms : (l : List (Token String)) -> { auto p : NonEmpty l } -> Terms
   terms [] {p} impossible
   terms ((Identifier x) :: []) = AllTerms (IdTerm x) []
+  terms ((Identifier x) :: ((InfixId y) :: xs@(_ :: _))) = TermsAndThen (IdTerm x) [] y $ parse xs
   terms ((Identifier x) :: xs@(_ :: _)) = consIdTerm x $ terms xs
   terms ((Raw x) :: []) = AllTerms (RawTerm x) []
   terms ((Raw x) :: xs@(_ :: _)) = consRawTerm x $ terms xs
-  terms ((Identifier x) :: ((InfixId y) :: xs@(_ :: _))) = TermsAndThen (IdTerm x) [] y $ parse xs
-  terms ((Raw x) :: ((InfixId y) :: xs@(_ :: _))) = TermsAndThen (RawTerm x) [] y $ parse xs
   terms ((InfixId x) :: []) = AllTerms (IdTerm x) []
   terms ((InfixId x) :: xs@(_ :: _)) = consIdTerm x $ terms xs
-  terms ((Raw x) :: xs@(_ :: _)) = consRawTerm x $ terms xs
 
   parse_ : String -> List (Token String) -> NopeAst
   parse_ i [] = IdTerm i
-  parse_ i ts@((Identifier x) :: _) =
+  parse_ i ((InfixId ii) :: []) =
+    Appl (IdTerm i) (IdTerm ii) []
+  parse_ i ((InfixId ii) :: ts@(_ :: _)) =
+    Appl (IdTerm ii) (IdTerm i) [parse ts]
+  parse_ i ts@(_ :: _) =
     case terms ts of
       (AllTerms ast asts) =>
         Appl (IdTerm i) ast asts
       (TermsAndThen ast asts ii a) =>
         Appl (IdTerm ii) (Appl (IdTerm i) ast asts) [a]
-  parse_ i ts@((Raw x) :: _) =
-    case terms ts of
-      (AllTerms ast asts) =>
-        Appl (RawTerm i) ast asts
-      (TermsAndThen ast asts ii a) =>
-        Appl (RawTerm ii) (Appl (RawTerm i) ast asts) [a]
-  parse_ i ((InfixId ii) :: []) =
-    Appl (IdTerm i) (IdTerm ii) []
-  parse_ i ((InfixId ii) :: ts@(_ :: _)) =
-    Appl (IdTerm ii) (IdTerm i) [parse ts]
-  parse_ i ((Raw ii) :: []) =
-    Appl (RawTerm i) (RawTerm ii) []
-  parse_ i ((Raw ii) :: ts@(_ :: _)) =
-    Appl (RawTerm ii) (RawTerm i) [parse ts]
 
   parse : (l : List (Token String)) -> { auto p : NonEmpty l } -> NopeAst
   parse [] {p} impossible
   parse ((Identifier i) :: ts) = parse_ i ts
   parse ((InfixId i) :: ts) = parse_ i ts
-  parse ((Raw i) :: ts) = parse_ i ts
+  parse ((Raw i) :: ts) = parse_ i ts -- TODO first term as raw will not be treated as raw
 
 export
 parseNope : String -> Maybe NopeAst
