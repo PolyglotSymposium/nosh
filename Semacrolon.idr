@@ -20,9 +20,22 @@ data SemacrolonAst : Type where
   MacroDef : String -> List SemacrolonExpr -> NopeAst -> SemacrolonAst
   MacroExpr : SemacrolonExpr -> SemacrolonAst
 
-parseMacro : NopeAst -> SemacrolonAst
-parseMacro (TermAst x) = ?parseMacro_rhs_1
-parseMacro (Appl ast ast_ xs) = ?parseMacro_rhs_2
+mutual
+  -- This is necessary for totality
+  unwrapQuotedIds_ : List NopeAst -> List NopeAst
+  unwrapQuotedIds_ [] = []
+  unwrapQuotedIds_ (ast :: asts) = unwrapQuotedIds ast :: unwrapQuotedIds_ asts
+
+  unwrapQuotedIds : NopeAst -> NopeAst
+  unwrapQuotedIds (TermAst (Raw '#' y)) = TermAst (Id y)
+  unwrapQuotedIds (TermAst term@(Raw _ _)) = TermAst term
+  unwrapQuotedIds (TermAst term@(Id _)) = TermAst term
+  unwrapQuotedIds (Appl ast ast_ asts) =
+    Appl (unwrapQuotedIds ast) (unwrapQuotedIds ast_) (unwrapQuotedIds_ asts)
+
+parseMacroExpr : NopeAst -> Maybe SemacrolonExpr
+
+parseMacro : NopeAst -> Maybe SemacrolonAst
 
 execMacro : SemacrolonAst -> NopeAst
 execMacro (MacroDef x xs ast) = ?execMacro_rhs_1
