@@ -34,6 +34,14 @@ mutual
     Appl (unwrapQuotedIds ast) (unwrapQuotedIds ast_) (unwrapQuotedIds_ asts)
 
 parseMacroExpr : NopeAst -> Maybe SemacrolonExpr
+parseMacroExpr (TermAst term@(Raw _ _)) = Just $ SemacrolonTerm term
+parseMacroExpr (TermAst (Id x)) =
+  case unpack x of
+    ('#' :: _) => Nothing
+    (';' :: _) => Just $ MacroAppl x []
+    _ =>  Just $ SemacrolonTerm $ Id x
+parseMacroExpr (Appl (TermAst x) ast2 xs) = ?parseMacroExpr_rhs_1
+parseMacroExpr (Appl (Appl ast ast_ ys) ast2 xs) = ?parseMacroExpr_rhs_3
 
 parseMacro : NopeAst -> Maybe SemacrolonAst
 
